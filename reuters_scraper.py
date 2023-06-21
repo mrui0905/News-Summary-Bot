@@ -28,6 +28,6 @@ def retrieve_reuters():
         link = link[1:]
         articles.append(link)
 
-    articles = [a for a in articles if len(a) > 20]
+    articles = ['https://www.reuters.com/' + a for a in articles if len(a) > 20]
 
     return articles

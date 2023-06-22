@@ -48,7 +48,7 @@ def save_list_to_file(lst, filename):
         for item in lst:
             file.write(item + '\n')
 
-save_list_to_file(summarize_articles(), 'output.txt')
+#save_list_to_file(summarize_articles(), 'output.txt')
 
         
 

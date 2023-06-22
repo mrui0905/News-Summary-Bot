@@ -2,24 +2,20 @@ import openai
 import environment as env
 import summarize_reuters as s
 
+# Initalize API Keys
 def initalize_key():
     openai.api_key = env.OPENAI_API_KEY
 
 def create_newsletter():
-    initalize_key()
-    article_summaries = s.summarize_articles()
-    '''
-    article_summaries = []
-    with open('output.txt', 'r') as file:
-        for line in file:
-            if len(line) > 30:
-                article_summaries.append(line.strip())
-    '''
+    initalize_key() # Ensure API is validated
+    article_summaries = s.summarize_articles() # Retrieve article url's
 
+    # Split article summaries into 2 equally long lists
     a, b = article_summaries[:len(article_summaries)//2], article_summaries[len(article_summaries)//2:]
 
     complete_response = []
 
+    # Summarize each group of summaries
     for lst in [a, b]:
         prompt = "Here are a collection of summaries. Summarize these summary into one summary of approximately 400 words. Some news events may appear in more than one part of the collection of summaries. Write more about news events that appear more often. Make sure that the summary is objective and doesn't repeat the same event twice. Here are the summaries: "
         
@@ -35,6 +31,7 @@ def create_newsletter():
         response = response.choices[0].text.strip()
         complete_response.append(response)
 
+    # Combined two summaries into one final summary 
     prompt = "Here are a collection of summaries. Summarize these summary into one summary of approximately 400 words. Some news events may appear in more than one part of the collection of summaries. Write more about news events that appear more often. Make sure that the summary is objective and doesn't repeat the same event twice. Here are the summaries: "
     
     response = openai.Completion.create(
@@ -48,10 +45,7 @@ def create_newsletter():
 
     response = response.choices[0].text.strip()
 
-    #print(response)
     return response
-
-#create_newsletter()
 
 
 

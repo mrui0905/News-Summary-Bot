@@ -1,66 +1,68 @@
-import os
-import pickle
-# Gmail API utils
-from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
-# for encoding/decoding messages in base64
-from base64 import urlsafe_b64decode, urlsafe_b64encode
-# for dealing with attachement MIME types
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from email.mime.image import MIMEImage
-from email.mime.audio import MIMEAudio
-from email.mime.base import MIMEBase
-from mimetypes import guess_type as guess_mime_type
-
+from __future__ import print_function
+import base64
+from email.message import EmailMessage
 import email_destinations
-from datetime import datetime
 import create_newsletter
+import os.path
+from datetime import datetime
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
 
-# Request all access (permission to read/send/receive emails, manage the inbox, and more)
 SCOPES = ['https://mail.google.com/']
-our_email = 'morningsummary@gmail.com'
 
-def gmail_authenticate():
+# Send email detailing summary of news articles
+def gmail_send_message():
+    
+    # Ensure API is validated
     creds = None
-    # the file token.pickle stores the user's access and refresh tokens, and is
-    # created automatically when the authorization flow completes for the first time
-    if os.path.exists("token.pickle"):
-        with open("token.pickle", "rb") as token:
-            creds = pickle.load(token)
-    # if there are no (valid) credentials availablle, let the user log in.
+    if os.path.exists('token.json'):
+        creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+    # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file('credentials.json', SCOPES)
+            flow = InstalledAppFlow.from_client_secrets_file(
+                'credentials.json', SCOPES)
             creds = flow.run_local_server(port=0)
-        # save the credentials for the next run
-        with open("token.pickle", "wb") as token:
-            pickle.dump(creds, token)
-    return build('gmail', 'v1', credentials=creds)
+        # Save the credentials for the next run
+        with open('token.json', 'w') as token:
+            token.write(creds.to_json())
 
-# get the Gmail API service
-service = gmail_authenticate()
 
-def build_message(destination, obj, body):
-    message = MIMEText(body)
-    message['to'] = destination
-    message['from'] = our_email
-    message['subject'] = obj
+    try:
+        service = build('gmail', 'v1', credentials=creds)
 
-    return {'raw': urlsafe_b64encode(message.as_bytes()).decode()}
+        # Draft & Send email to every destination address
+        for destination in email_destinations.destinations:
+            message = EmailMessage()
 
-def send_message(service, destination, obj, body):
-    return service.users().messages().send(
-      userId="me",
-      body=build_message(destination, obj, body)
-    ).execute()
+            message.set_content(create_newsletter.create_newsletter()) # Create body of email (summary of news)
 
-subject = 'Morning Summary ', datetime.now().strftime("%Y-%m-%d")
-#body = create_newsletter.create_newsletter()
-body = "This is a test"
+            message['To'] = destination
+            message['From'] = 'morningsummary@gmail.com'
+            message['Subject'] = 'Morning News Summary ', datetime.now().strftime("%Y-%m-%d") # Create subject line with current date
 
-for destination in email_destinations.destinations:
-    send_message(service, destination, subject, body)
+            # encoded message
+            encoded_message = base64.urlsafe_b64encode(message.as_bytes()) \
+                .decode()
+
+            create_message = {
+                'raw': encoded_message
+            }
+            # pylint: disable=E1101
+            send_message = (service.users().messages().send
+                            (userId="me", body=create_message).execute())
+            print(F'Message Id: {send_message["id"]}')
+    except HttpError as error:
+        print(F'An error occurred: {error}')
+        send_message = None
+    return
+
+
+if __name__ == '__main__':
+    gmail_send_message()
+

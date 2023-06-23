@@ -44,7 +44,7 @@ def gmail_send_message():
 
             message['To'] = destination
             message['From'] = 'morningsummary@gmail.com'
-            message['Subject'] = 'Morning News Summary ', datetime.now().strftime("%Y-%m-%d") # Create subject line with current date
+            message['Subject'] = 'Morning News Summary ' + datetime.now().strftime("%Y-%m-%d") # Create subject line with current date
 
             # encoded message
             encoded_message = base64.urlsafe_b64encode(message.as_bytes()) \

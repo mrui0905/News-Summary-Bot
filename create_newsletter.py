@@ -6,9 +6,9 @@ import summarize_reuters as s
 def initalize_key():
     openai.api_key = env.OPENAI_API_KEY
 
-def create_newsletter():
+def create_newsletter(topic):
     initalize_key() # Ensure API is validated
-    article_summaries = s.summarize_articles() # Retrieve article url's
+    article_summaries = s.summarize_articles(topic) # Retrieve article url's
 
     # Split article summaries into 2 equally long lists
     a, b = article_summaries[:len(article_summaries)//2], article_summaries[len(article_summaries)//2:]

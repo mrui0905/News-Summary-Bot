@@ -2,8 +2,8 @@ from bs4 import BeautifulSoup
 import requests
 
 # Returns urls from Reuter's front page news
-def retrieve_reuters():
-    html = requests.get('https://www.reuters.com/world/').text
+def retrieve_reuters(topic='world'):
+    html = requests.get('https://www.reuters.com/' + topic + '/').text
     soup = BeautifulSoup(html, 'html.parser')
 
     articles =[]

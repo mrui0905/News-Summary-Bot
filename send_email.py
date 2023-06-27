@@ -14,7 +14,7 @@ from googleapiclient.errors import HttpError
 SCOPES = ['https://mail.google.com/']
 
 # Send email detailing summary of news articles
-def gmail_send_message():
+def gmail_send_message(topic):
     
     # Ensure API is validated
     creds = None
@@ -36,11 +36,13 @@ def gmail_send_message():
     try:
         service = build('gmail', 'v1', credentials=creds)
 
+        text = create_newsletter.create_newsletter(topic)
+
         # Draft & Send email to every destination address
         for destination in email_destinations.destinations:
             message = EmailMessage()
 
-            message.set_content(create_newsletter.create_newsletter()) # Create body of email (summary of news)
+            message.set_content(text) # Create body of email (summary of news)
 
             message['To'] = destination
             message['From'] = 'morningsummary@gmail.com'
@@ -64,5 +66,6 @@ def gmail_send_message():
 
 
 if __name__ == '__main__':
-    gmail_send_message()
+    topic = 'world/us'
+    gmail_send_message(topic)
 

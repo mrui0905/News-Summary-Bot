@@ -8,11 +8,11 @@ import openai
 def initalize_key():
     openai.api_key = env.OPENAI_API_KEY
 
-def summarize_articles():
+def summarize_articles(topic):
     initalize_key() # Validate API
     article_summaries = []
 
-    articles = rs.retrieve_reuters() # Retrieve url's
+    articles = rs.retrieve_reuters(topic) # Retrieve url's
 
     # Parse every article's html to extract article text
     for article in articles[:40]:

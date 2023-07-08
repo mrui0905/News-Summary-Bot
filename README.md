@@ -1,6 +1,6 @@
 # news-scraper
 
-**Daily News Summary App
+**Daily News Summary App**
 
 App that sends daily morning emails summarizing the daily news (7 possible filters: World, United States, Legal, Business, Technology, 
 Markets, Sustainability, Investigations). 

@@ -1,12 +1,15 @@
 from bs4 import BeautifulSoup
 import requests
 import reuters_scraper as rs
-import environment as env
+from dotenv import load_dotenv
+import os
 import openai
 
 # Ensure API is validated
 def initalize_key():
-    openai.api_key = env.OPENAI_API_KEY
+    load_dotenv()
+
+    openai.api_key = os.getenv('OPENAI_API_KEY')
 
 def summarize_articles(topic):
     initalize_key() # Validate API

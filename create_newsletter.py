@@ -1,10 +1,13 @@
 import openai
-import environment as env
+from dotenv import load_dotenv
+import os
 import summarize_reuters as s
 
 # Initalize API Keys
 def initalize_key():
-    openai.api_key = env.OPENAI_API_KEY
+    load_dotenv()
+
+    openai.api_key = os.getenv('OPENAI_API_KEY')
 
 def create_newsletter(topic):
     initalize_key() # Ensure API is validated

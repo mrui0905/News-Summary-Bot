@@ -1,4 +1,4 @@
-environment.py
+environment.env
 credentials.json
 email_destinations.json
 token.json

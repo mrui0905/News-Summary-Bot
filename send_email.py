@@ -1,7 +1,7 @@
 from __future__ import print_function
 import base64
 from email.message import EmailMessage
-import email_destinations
+import json
 import create_newsletter
 import os.path
 from datetime import datetime
@@ -38,8 +38,16 @@ def gmail_send_message(topic):
 
         text = create_newsletter.create_newsletter(topic)
 
+        emails = []
+        with open('email_destinations.json', 'r+') as f:
+            e = json.load(f)
+
+            emails = e["emails"]
+
+        f.close()
+
         # Draft & Send email to every destination address
-        for destination in email_destinations.destinations:
+        for destination in emails:
             message = EmailMessage()
 
             message.set_content(text) # Create body of email (summary of news)

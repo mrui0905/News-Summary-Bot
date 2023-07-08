@@ -2,6 +2,7 @@ import streamlit as st
 import json
 import create_newsletter
 
+# Ensures summary can be displayed
 st.markdown("""
     <style>
         .container {
@@ -11,9 +12,10 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-
+# App Title
 st.title('Daily News Summary')
 
+# Add subscription
 st.subheader('Add email to daily subscription:')
 email = st.text_input('Enter Subscription Email: ')
 a = st.button('Submit', key = 1)
@@ -29,6 +31,7 @@ if a:
     f.close()
     st.success('Email submitted successfully!')
 
+# Options of news summaries to choose from
 st.subheader('Display news summary:')
 topics = {'World' : 'world', 
             'Business' : 'business',
@@ -39,6 +42,7 @@ topics = {'World' : 'world',
             'Investigations' : 'investigations',
             'United States' : 'world/us'}
 
+# Generate news summary, display on app
 option = st.selectbox('Select a news category to generate news summary: ', sorted(topics.keys()))
 b = st.button('Submit', key = 2)
 if b:
